@@ -33,7 +33,7 @@
                                 <span t-if="o.move_type == 'in_invoice'">فاتورة مورد</span>
                             </td>
                             <th width="15%" class="text-right">النوع</th>
-                            <td width="30%" rowspan="6">
+                            <td width="30%" rowspan="4">
                                 <t t-if="o.state == 'posted'">
                                     <span  t-field="o.qr_image" t-options='{"widget": "image"}' />
                                 </t>
