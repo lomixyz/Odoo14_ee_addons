@@ -33,8 +33,14 @@ odoo.define('code_backend_theme_enterprise.SidebarMenu', function (require) {
     $(document).on("click", "#openSidebar", function(event){
     console.log('hellooo')
         $("#sidebar_panel").css({'display':'block'});
-        $(".o_action_manager").css({'margin-left': '200px','transition':'all .1s linear'});
-        $(".top_heading").css({'margin-left': '180px','transition':'all .1s linear'});
+
+        if($('body').hasClass('o_rtl')){
+            $(".o_action_manager").css({'margin-right': '200px','transition':'all .1s linear'});
+            $(".top_heading").css({'margin-right': '180px','transition':'all .1s linear'});
+        }else{
+            $(".o_action_manager").css({'margin-left': '200px','transition':'all .1s linear'});
+            $(".top_heading").css({'margin-left': '180px','transition':'all .1s linear'});
+        }
 
         //add class in navbar
         var navbar = $(".o_main_navbar");
@@ -56,8 +62,13 @@ odoo.define('code_backend_theme_enterprise.SidebarMenu', function (require) {
     });
     $(document).on("click", "#closeSidebar", function(event){
         $("#sidebar_panel").css({'display':'none'});
-        $(".o_action_manager").css({'margin-left': '0px'});
-        $(".top_heading").css({'margin-left': '0px'});
+        if($('body').hasClass('o_rtl')){
+            $(".o_action_manager").css({'margin-right': '0px'});
+            $(".top_heading").css({'margin-right': '0px'});
+        }else{
+            $(".o_action_manager").css({'margin-left': '0px'});
+            $(".top_heading").css({'margin-left': '0px'});
+        }
 
         //remove class in navbar
         var navbar = $(".o_main_navbar");
@@ -88,8 +99,8 @@ odoo.define('code_backend_theme_enterprise.SidebarMenu', function (require) {
 
         //sidebar close on menu-item click
         $("#sidebar_panel").css({'display':'none'});
-        $(".o_action_manager").css({'margin-left': '0px'});
-        $(".top_heading").css({'margin-left': '0px'});
+        $(".o_action_manager").css({'margin-left': '0px','margin-right': '0px'});
+        $(".top_heading").css({'margin-left': '0px','margin-right': '0px'});
         $("#closeSidebar").hide();
         $("#openSidebar").show();
 

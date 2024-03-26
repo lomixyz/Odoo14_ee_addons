@@ -13,7 +13,7 @@
                 </a>
 			</div>
 			<div class="sidebar_logo">
-				<img src="/web/binary/company_logo" class="logo_img"/>
+				<img src="/code_backend_theme_enterprise/static/src/img/code_logo.png" class="logo_img"/>
 			</div>
             <h6 class="sidebar_head">MENU</h6>
             <ul class="sidebar_menu">
