@@ -113,6 +113,9 @@ class AccountChartTemplate(models.Model):
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class AccountJournal(models.Model):
     _inherit = "account.journal"
@@ -167,7 +170,8 @@ class AccountJournal(models.Model):
                 default_account_code = self.env['account.account']._search_new_account_code(company, digits, liquidity_account_prefix)
                 default_account_vals = self._prepare_liquidity_account_vals(company, default_account_code, vals)
                 default_account_vals['parent_id'] = parent.id
-                vals['default_account_id'] = self.env['account.account'].create(default_account_vals).id
+                res = self.env['account.account'].create(default_account_vals)
+                vals['default_account_id'] = res.id 
             if not has_payment_accounts:
                 vals['payment_debit_account_id'] = self._create_payment_account(_("Outstanding Receipts"), current_assets_type, company, parent, digits, liquidity_account_prefix)
                 vals['payment_credit_account_id'] = self._create_payment_account(_("Outstanding Payments"), current_assets_type, company, parent, digits, liquidity_account_prefix)
@@ -188,5 +192,5 @@ class AccountJournal(models.Model):
             'user_type_id': account_type.id,
             'company_id': company.id,
             'parent_id': parent.id,
-        })
+        }).id
 

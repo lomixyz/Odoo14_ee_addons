@@ -16,3 +16,5 @@ class PaymentCustom(models.Model):
             if record.move_type == 'out_invoice':
                 if all(value <= 0 for value in [record.cash , record.shabaka, record.transfer, record.credit]):
                     raise ValidationError(_("Values of fields cash, shabaka, transfer, and credit must be greater than zero for customer invoices."))
+
+
