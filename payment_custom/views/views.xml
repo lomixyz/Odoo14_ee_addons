@@ -16,5 +16,20 @@
         </field>
     </record>
     
+    <record id="view_out_invoice_tree" model="ir.ui.view">
+        <field name="name">account.move.form.inherited</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_untaxed_signed']" position="after">
+              <field name="cash" sum="Total" optional="hide" attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))],'readonly': [('state', '!=', 'draft')]}"/>
+              <field name="shabaka" sum="Total" optional="hide" attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))],'readonly': [('state', '!=', 'draft')]}"/>
+              <field name="transfer" sum="Total" optional="hide" attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))],'readonly': [('state', '!=', 'draft')]}"/>
+              <field name="credit" sum="Total" optional="hide" attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))],'readonly': [('state', '!=', 'draft')]}"/>
+              <!--   -->
+            </xpath>
+        </field>
+    </record>
+    
   </data>
 </odoo>
