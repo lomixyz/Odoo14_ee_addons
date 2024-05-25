@@ -22,6 +22,7 @@ class ResCompany(models.Model):
     )
     parent_bank_cash_account_id = fields.Many2one('account.account')
 
+    @api.model
     def setting_chart_of_accounts_action(self):
         """Action for 'Chart of Accounts' button in setup bar."""
         company = self.env.company

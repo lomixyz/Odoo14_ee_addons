@@ -6,7 +6,7 @@ odoo.define('app_odoo_customize.app_system_name', function (require) {
         init: function () {
             this._super.apply(this, arguments);
 
-            this.set('title_part', { "zopenerp": "Mada Way" });
+            this.set('title_part', { "zopenerp": "Moda Way" });
         }
     });
 
