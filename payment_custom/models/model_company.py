@@ -6,7 +6,7 @@ from odoo import models , fields
 class ResPartnerCustom(models.Model):
     _inherit = 'res.partner'
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True,
+    company_id = fields.Many2one('res.company', string='Company', readonly=True,
             default=lambda self: self.env.company)
 
 
