@@ -2,11 +2,12 @@
 
 from odoo import models , fields
 
-# class ResPartnerCustom(models.Model):
-#     _inherit = 'res.partner'
 
-#     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True,
-#             default=lambda self: self.env.company)
+class ResPartnerCustom(models.Model):
+    _inherit = 'res.partner'
+
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True,
+            default=lambda self: self.env.company)
 
 
 class ProductTemplateCustom(models.Model):
