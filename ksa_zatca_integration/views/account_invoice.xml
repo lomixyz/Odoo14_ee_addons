@@ -3,12 +3,12 @@
         <record id="invoice_tree" model="ir.ui.view">
             <field name="name">account.move</field>
             <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="after">
                     <field name="is_self_billed" invisible="1"/>
                     <field name="is_zatca" invisible="1"/>
-                    <field name="l10n_sa_zatca_status" widget="badge" invisible="context.get('move_type') not in ('out_invoice', 'out_refund')" attrs="{'invisible': ['|', '|', ('is_zatca', '=', False),
+                    <field name="l10n_sa_zatca_status" widget="badge"  attrs="{'invisible': ['|', '|', ('is_zatca', '=', False),
                                                  '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                  '&amp;', ('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])]}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
                     <!-- decoration-success="l10n_sa_zatca_status in ['REPORTED','CLEARED']"-->
@@ -32,8 +32,11 @@
                     <field name="is_self_billed" invisible="1"/>
                     <field name="zatca_invoice" invisible="1"/>
                     <field name="is_zatca" invisible="1"/>
+                   <!-- <button name="create_xml_file" type="object" string="Generate Zatca XML" class="oe_highlight"/> -->
 
-                    <button name="send_for_compliance" type="object" string="Send to Zatca for Compliance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']),
+                    <button name="send_for_compliance" type="object"
+                     string="Send to Zatca for Compliance" class="oe_highlight"
+                      attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']),
                                                 ('zatca_compliance_invoices_api','not in', [0, None, '', False]), ('zatca_onboarding_status','=', True),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),

@@ -163,7 +163,8 @@ class AccountMove(models.Model):
         for res in self:
             res.l10n_sa_zatca_status = "Not Sended to Zatca"
             sa_confirmation_datetime = datetime.datetime.strptime(res.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT) if res.sa_confirmation_datetime else False
-            l10n_sa_phase1_end_date = datetime.datetime.strptime(res.l10n_sa_phase1_end_date, DEFAULT_SERVER_DATE_FORMAT).date() if res.l10n_sa_phase1_end_date else False
+            print("*****************************res.l10n_sa_phase1_end_date", res.l10n_sa_phase1_end_date, res.company_id)
+            l10n_sa_phase1_end_date = datetime.datetime.strptime(str(res.l10n_sa_phase1_end_date), DEFAULT_SERVER_DATE_FORMAT).date() if res.l10n_sa_phase1_end_date else False
             if sa_confirmation_datetime and l10n_sa_phase1_end_date and sa_confirmation_datetime.date() <= l10n_sa_phase1_end_date:
                 res.l10n_sa_zatca_status = "Phase 1"
             elif res.zatca_compliance_invoices_api:
