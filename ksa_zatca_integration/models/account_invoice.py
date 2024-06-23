@@ -529,7 +529,7 @@ class AccountMove(models.Model):
         self.invoice_ksa_validations()
         l10n_sa_delivery_date = self.l10n_sa_delivery_date
 
-        bt_3 = '383' if self.debit_move_id.id else ('381' if self.move_type == 'out_refund' else '388')
+        bt_3 = '383' if self.debit_origin_id.id else ('381' if self.move_type == 'out_refund' else '388')
         bt_25 = self.env['account.move']
         if bt_3 != '388':
             # if 'Shop' in self.ref:

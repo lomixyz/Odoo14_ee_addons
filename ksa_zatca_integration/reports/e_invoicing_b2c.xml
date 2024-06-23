@@ -189,7 +189,7 @@
                                         <td>
                                             <span class="data_column">
                                                 <t t-esc="doc.refund_move_id.zatca_unique_seq"/>
-                                                <t t-esc="doc.debit_move_id.zatca_unique_seq"/>
+                                                <t t-esc="doc.debit_origin_id.zatca_unique_seq"/>
                                             </span>
                                         </td>
                                         <td>

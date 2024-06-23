@@ -133,7 +133,7 @@
                                             <td class="second_table">
                                                 <span>
                                                     <t t-esc="doc.refund_move_id.zatca_unique_seq"/>
-                                                    <t t-esc="doc.debit_move_id.zatca_unique_seq"/>
+                                                    <t t-esc="doc.debit_origin_id.zatca_unique_seq"/>
                                                 </span>
                                             </td>
                                             <td class="second_table" style="text-align:right;">
