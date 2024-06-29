@@ -1868,6 +1868,7 @@ class AccountMove(models.Model):
                         elif record.l10n_sa_invoice_type == 'Simplified':
                             record.send_for_reporting(self._context)
         return res
+    
     def action_post(self):
         conf = self.company_id.sudo()
         res = super().action_post()

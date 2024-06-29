@@ -36,17 +36,17 @@
 
                     <button name="send_for_compliance" type="object"
                      string="Send to Zatca for Compliance" class="oe_highlight"
-                      attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']),
+                      attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['posted']),
                                                 ('zatca_compliance_invoices_api','not in', [0, None, '', False]), ('zatca_onboarding_status','=', True),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
                                                 '&amp;',('l10n_is_self_billed_invoice', '=', False), ('move_type', 'in', ['in_invoice', 'in_refund'])]}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    <button name="send_for_clearance" type="object" string="Send to Zatca for Clearance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|','|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']), ('l10n_sa_invoice_type','!=', 'Standard'),
+                    <button name="send_for_clearance" type="object" string="Send to Zatca for Clearance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|','|', ('is_zatca', '=', False), ('state','not in',['posted']), ('l10n_sa_invoice_type','!=', 'Standard'),
                                                  ('zatca_compliance_invoices_api','not in', [0, None, '', False]), ('zatca_onboarding_status','=', False),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
                                                 '&amp;',('l10n_is_self_billed_invoice', '=', False), ('move_type', 'in', ['in_invoice', 'in_refund'])]}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    <button name="send_for_reporting" type="object" string="Send to Zatca for Reporting" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']), ('l10n_sa_invoice_type','!=', 'Simplified'),
+                    <button name="send_for_reporting" type="object" string="Send to Zatca for Reporting" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['posted']), ('l10n_sa_invoice_type','!=', 'Simplified'),
                                                 ('zatca_compliance_invoices_api','not in', [0, None, '', False]), ('zatca_onboarding_status','=', False),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
@@ -58,15 +58,15 @@
                     <button name="send_for_reporting" type="object" string="Send to Zatca for Reporting" class="oe_highlight"
                             attrs="{'invisible':['|', '|', '|', ('state','!=','posted'), ('l10n_sa_invoice_type','!=', 'Simplified'), ('zatca_invoice_name','not in', [0, None, '', False]), ('zatca_onboarding_status','=', False)]}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/> -->
                     <!--                    Resend in case of 400-->
-                    <button name="send_for_compliance" type="object" string="ReSend to Zatca for Compliance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']), ('zatca_onboarding_status','=', True), ('zatca_status_code','!=','400'),
+                    <button name="send_for_compliance" type="object" string="ReSend to Zatca for Compliance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['posted']), ('zatca_onboarding_status','=', True), ('zatca_status_code','!=','400'),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
                                                 '&amp;',('l10n_is_self_billed_invoice', '=', False), ('move_type', 'in', ['in_invoice', 'in_refund'])]}" context="{'xml_generate': 1}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    <button name="send_for_clearance" type="object" string="ReSend to Zatca for Clearance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']), ('zatca_onboarding_status','=', False), ('l10n_sa_invoice_type','!=', 'Standard'), ('zatca_status_code','!=','400'),
+                    <button name="send_for_clearance" type="object" string="ReSend to Zatca for Clearance" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['posted']), ('zatca_onboarding_status','=', False), ('l10n_sa_invoice_type','!=', 'Standard'), ('zatca_status_code','!=','400'),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
                                                 '&amp;',('l10n_is_self_billed_invoice', '=', False), ('move_type', 'in', ['in_invoice', 'in_refund'])]}" context="{'xml_generate': 1}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    <button name="send_for_reporting" type="object" string="ReSend to Zatca for Reporting" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['open', 'paid']), ('zatca_onboarding_status','=', False), ('l10n_sa_invoice_type','!=', 'Simplified'), ('zatca_status_code','!=','400'),
+                    <button name="send_for_reporting" type="object" string="ReSend to Zatca for Reporting" class="oe_highlight" attrs="{'invisible':['|', '|', '|', '|', '|', '|', '|', ('is_zatca', '=', False), ('state','not in',['posted']), ('zatca_onboarding_status','=', False), ('l10n_sa_invoice_type','!=', 'Simplified'), ('zatca_status_code','!=','400'),
                                                 '&amp;', ('is_self_billed', '=', False), ('move_type', 'not in', ['out_invoice', 'out_refund']),
                                                 '&amp;',('is_self_billed', '=', True), ('move_type', 'not in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']),
                                                 '&amp;',('l10n_is_self_billed_invoice', '=', False), ('move_type', 'in', ['in_invoice', 'in_refund'])]}" context="{'xml_generate': 1}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
