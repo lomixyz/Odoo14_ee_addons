@@ -22,16 +22,16 @@ class AccountMoveLine(models.Model):
         self.quantity = 0 if self.quantity < 0 else self.quantity
         self.price_unit = abs(self.price_unit)
 
-    @api.onchange('invoice_line_tax_ids')
+    @api.onchange('tax_ids')
     def onchange_tax_ids(self):
         for record in self:
             if record.is_zatca:
-                if len(record.invoice_line_tax_ids.ids) > 1:
+                if len(record.tax_ids.ids) > 1:
                     raise exceptions.ValidationError("Only 1 tax can be applied per line.")
                 if len(list(
-                        set(record.move_id.invoice_line_ids.mapped('invoice_line_tax_ids').filtered(lambda x: x.classified_tax_category == 'E').mapped('tax_exemption_selection')))) > 1 \
+                        set(record.move_id.invoice_line_ids.mapped('tax_ids').filtered(lambda x: x.classified_tax_category == 'E').mapped('tax_exemption_selection')))) > 1 \
                         or \
-                        len(list(set(record.move_id.invoice_line_ids.mapped('invoice_line_tax_ids').filtered(lambda x: x.classified_tax_category == 'Z').mapped(
+                        len(list(set(record.move_id.invoice_line_ids.mapped('tax_ids').filtered(lambda x: x.classified_tax_category == 'Z').mapped(
                             'tax_exemption_selection')))) > 1:
                     raise exceptions.ValidationError("Multiple tax reasons for same tax group can't be applied in one invoice.")
                 # if self.tax_ids.filtered(lambda x: x.invoice_line_id.tax_ids.tax_exemption_code)

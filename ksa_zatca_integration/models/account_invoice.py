@@ -162,7 +162,7 @@ class AccountMove(models.Model):
     def _compute_l10n_sa_zatca_status(self):
         for res in self:
             res.l10n_sa_zatca_status = "Not Sended to Zatca"
-            sa_confirmation_datetime = datetime.datetime.strptime(res.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT) if res.sa_confirmation_datetime else False
+            sa_confirmation_datetime = datetime.datetime.strptime(str(res.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT) if res.sa_confirmation_datetime else False
             print("*****************************res.l10n_sa_phase1_end_date", res.l10n_sa_phase1_end_date, res.company_id)
             l10n_sa_phase1_end_date = datetime.datetime.strptime(str(res.l10n_sa_phase1_end_date), DEFAULT_SERVER_DATE_FORMAT).date() if res.l10n_sa_phase1_end_date else False
             if sa_confirmation_datetime and l10n_sa_phase1_end_date and sa_confirmation_datetime.date() <= l10n_sa_phase1_end_date:
@@ -514,6 +514,14 @@ class AccountMove(models.Model):
     def create_xml_file(self, previous_hash=0, pos_refunded_order_id=0):
         amount_verification = 0  # for debug mode
         conf = self.company_id.sudo()
+        print(self.sa_confirmation_datetime, self.move_type,self.country_code)
+        if not self.sa_confirmation_datetime :
+            if not self.l10n_sa_show_delivery_date:
+                raise exceptions.UserError(_('Delivery Date cannot be empty'))
+                print("**********************************")
+                self.sa_confirmation_datetime = fields.Datetime.now()
+            self.write({'sa_confirmation_datetime': fields.Datetime.now()})
+
         conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id)
         conf_partner = self._get_zatca_company_data(self.company_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
         if not conf.is_zatca:
@@ -648,13 +656,14 @@ class AccountMove(models.Model):
         if not previous_hash:
             ubl_2_1 += '''
                 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>'''
-        sa_confirmation_datetime = datetime.datetime.strptime(self.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
+        print("****************************************",self.sa_confirmation_datetime)
+        sa_confirmation_datetime = datetime.datetime.strptime(str(self.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
         ubl_2_1 += '''
             <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
             <cbc:ID>''' + str(self.check_allowed_size(1, 127, bt_1, 'bt_1')) + '''</cbc:ID>
             <cbc:UUID>''' + self.invoice_uuid + '''</cbc:UUID>
-            <cbc:IssueDate>''' + sa_confirmation_datetime.strftime('%Y-%m-%d') + '''</cbc:IssueDate>
-            <cbc:IssueTime>''' + sa_confirmation_datetime.strftime('%H:%M:%SZ') + '''</cbc:IssueTime>
+            <cbc:IssueDate>''' + self.sa_confirmation_datetime.strftime('%Y-%m-%d') + '''</cbc:IssueDate>
+            <cbc:IssueTime>''' + self.sa_confirmation_datetime.strftime('%H:%M:%SZ') + '''</cbc:IssueTime>
             <cbc:InvoiceTypeCode name="''' + ksa_2 + '''">''' + bt_3 + '''</cbc:InvoiceTypeCode>'''
         if self.ksa_note:
             ubl_2_1 += '''
@@ -668,7 +677,7 @@ class AccountMove(models.Model):
                 <cbc:ID>''' + str(self.check_allowed_size(0, 127, self.purchase_id.id, self._fields['purchase_id'].string)) + '''</cbc:ID>
             </cac:OrderReference>'''
         if bt_3 != '388':  # BR-KSA-56
-            bt_25_sa_confirmation_datetime = datetime.datetime.strptime(bt_25.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
+            bt_25_sa_confirmation_datetime = datetime.datetime.strptime(str(bt_25.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
             ubl_2_1 += '''
             <cac:BillingReference>
                 <cac:InvoiceDocumentReference>
@@ -750,7 +759,8 @@ class AccountMove(models.Model):
                         </cac:TaxScheme>
                     </cac:PartyTaxScheme>'''
         bt_121 = 0  # in ['VATEX-SA-EDU', 'VATEX-SA-HEA']
-        bt_121 = list(set(self.invoice_line_ids.mapped('invoice_line_tax_ids.tax_exemption_selection')))
+        # bt_121 = list(set(self.invoice_line_ids.mapped('tax_ids.tax_exemption_selection')))
+        bt_121 = list(set(self.invoice_line_ids.tax_ids.mapped('tax_exemption_selection')))
         # BR-KSA-25 and BR-KSA-42
         if is_tax_invoice or \
                 (not is_tax_invoice and ('VATEX-SA-EDU' in bt_121 or 'VATEX-SA-HEA' in bt_121)) or \
@@ -771,12 +781,12 @@ class AccountMove(models.Model):
         if delivery and ((bt_3 == '388' and ksa_2[:2] == '01' or not is_tax_invoice and self.l10n_is_summary_invoice) or (latest_delivery_date and not_know)):
             ubl_2_1 += '''
             <cac:Delivery>'''
-            ksa_5 = datetime.datetime.strptime(l10n_sa_delivery_date, DEFAULT_SERVER_DATE_FORMAT)
+            ksa_5 = datetime.datetime.strptime(str(l10n_sa_delivery_date), DEFAULT_SERVER_DATE_FORMAT)
             if bt_3 == '388' and ksa_2[:2] == '01' or not is_tax_invoice and self.l10n_is_summary_invoice:
                 ubl_2_1 += '''
                 <cbc:ActualDeliveryDate>''' + str(ksa_5.strftime('%Y-%m-%d')) + '''</cbc:ActualDeliveryDate>'''
             if latest_delivery_date and not_know:
-                ksa_24 = datetime.datetime.strptime(l10n_sa_delivery_date, DEFAULT_SERVER_DATE_FORMAT)
+                ksa_24 = datetime.datetime.strptime(str(l10n_sa_delivery_date) ,DEFAULT_SERVER_DATE_FORMAT)
                 if ksa_24 < ksa_5:
                     raise exceptions.ValidationError(_('LatestDeliveryDate must be less then or equal to ActualDeliveryDate'))
                 ubl_2_1 += '''
@@ -836,23 +846,23 @@ class AccountMove(models.Model):
             bt_131 = float('{:0.2f}'.format(float_round(bt_131, precision_rounding=0.01)))
             bt_106 += float('{:0.2f}'.format(float_round(bt_131, precision_rounding=0.01)))
             bt_106 = float('{:0.2f}'.format(float_round(bt_106, precision_rounding=0.01)))
-            bt_151 = invoice_line_id.invoice_line_tax_ids.classified_tax_category if invoice_line_id.invoice_line_tax_ids else "O"
-            bt_152 = float('{:0.2f}'.format(float_round(invoice_line_id.invoice_line_tax_ids.amount, precision_rounding=0.01))) if invoice_line_id.invoice_line_tax_ids else 0
+            bt_151 = invoice_line_id.tax_ids.classified_tax_category if invoice_line_id.tax_ids else "O"
+            bt_152 = float('{:0.2f}'.format(float_round(invoice_line_id.tax_ids.amount, precision_rounding=0.01))) if invoice_line_id.tax_ids else 0
             bt_152 = 100 if bt_152 > 100 else (0 if bt_152 < 0 else bt_152)
 
             if bt_151 == "Z":
                 bt_152 = 0
                 if not bg_23_list.get("Z", False):
-                    bg_23_list["Z"] = {'bt_116': 0, 'bt_121': invoice_line_id.invoice_line_tax_ids.tax_exemption_code,
-                                       'bt_120': invoice_line_id.invoice_line_tax_ids.tax_exemption_text,
+                    bg_23_list["Z"] = {'bt_116': 0, 'bt_121': invoice_line_id.tax_ids.tax_exemption_code,
+                                       'bt_120': invoice_line_id.tax_ids.tax_exemption_text,
                                        'bt_119': bt_152, 'bt_117': 0}
                 bg_23_list["Z"]['bt_116'] += bt_131
                 # bg_23_list = ["Z"]  # BR-Z-01
             elif bt_151 == "E":
                 bt_152 = 0
                 if not bg_23_list.get("E", False):
-                    bg_23_list["E"] = {'bt_116': 0, 'bt_121': invoice_line_id.invoice_line_tax_ids.tax_exemption_code,
-                                       'bt_120': invoice_line_id.invoice_line_tax_ids.tax_exemption_text,
+                    bg_23_list["E"] = {'bt_116': 0, 'bt_121': invoice_line_id.tax_ids.tax_exemption_code,
+                                       'bt_120': invoice_line_id.tax_ids.tax_exemption_text,
                                        'bt_119': bt_152, 'bt_117': 0}
                 bg_23_list["E"]['bt_116'] += bt_131
                 # bg_23_list = ["E"]  # BR-E-01
@@ -864,23 +874,23 @@ class AccountMove(models.Model):
             # elif bt_151 == "O":
             else:
                 bt_152 = 0
-                if bg_23_list.get('O') and bg_23_list['O'].get('bt_120', False) != (invoice_line_id.invoice_line_tax_ids.tax_exemption_text if len(invoice_line_id.invoice_line_tax_ids) > 0 else 'Not subject to VAT'):
+                if bg_23_list.get('O') and bg_23_list['O'].get('bt_120', False) != (invoice_line_id.tax_ids.tax_exemption_text if len(invoice_line_id.tax_ids) > 0 else 'Not subject to VAT'):
                     raise exceptions.MissingError(_("Multiple tax reasons for tax categpry") + (" 'O' ") + _("can't be applied in one invoice"))
                 if not bg_23_list.get("O", False):
-                    if invoice_line_id.invoice_line_tax_ids and (not invoice_line_id.invoice_line_tax_ids.tax_exemption_text or
-                                                    not invoice_line_id.invoice_line_tax_ids.tax_exemption_code):
+                    if invoice_line_id.tax_ids and (not invoice_line_id.tax_ids.tax_exemption_text or
+                                                    not invoice_line_id.tax_ids.tax_exemption_code):
                         raise exceptions.MissingError(_("Tax exemption Reason Text  is missing in Tax Category") + " 'O' ")
                     bg_23_list["O"] = {'bt_116': 0,
-                                       'bt_121': invoice_line_id.invoice_line_tax_ids.tax_exemption_code if
-                                                    len(invoice_line_id.invoice_line_tax_ids) > 0 else 'VATEX-SA-OOS',
-                                       'bt_120': invoice_line_id.invoice_line_tax_ids.tax_exemption_text if
-                                                    len(invoice_line_id.invoice_line_tax_ids) > 0 else 'Not subject to VAT',
+                                       'bt_121': invoice_line_id.tax_ids.tax_exemption_code if
+                                                    len(invoice_line_id.tax_ids) > 0 else 'VATEX-SA-OOS',
+                                       'bt_120': invoice_line_id.tax_ids.tax_exemption_text if
+                                                    len(invoice_line_id.tax_ids) > 0 else 'Not subject to VAT',
                                        'bt_119': 0, 'bt_117': 0}
                 bg_23_list["O"]['bt_116'] += bt_131
                 # bg_23_list = ["O"]  # BR-O-01
 
             def next_invoice_line_id(invoice_line_id):
-                id = self.env['ir.sequence'].with_context(force_company=self.company_id.id).next_by_code('zatca.move.line.seq')
+                id = self.env['ir.sequence'].with_context(company_id=self.company_id.id).next_by_code('zatca.move.line.seq')
                 if invoice_line_id.sudo().search([('zatca_id', '=', id)]).id:
                     id = next_invoice_line_id(invoice_line_id)
                 return id
@@ -1432,7 +1442,7 @@ class AccountMove(models.Model):
                 self.zatca_compliance_invoices_api = json_iterated
 
                 partner_id, company_id, unknown, unknown, unknown, unknown = self._get_partner_comapny(self.company_id)
-                sa_confirmation_datetime = datetime.datetime.strptime(self.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
+                sa_confirmation_datetime = datetime.datetime.strptime(str(self.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
                 file_name_specification = str(company_id.vat) + "_" + sa_confirmation_datetime.strftime('%Y%m%dT%H%M%SZ') + "_" + str(re.sub(r"[^a-zA-Z0-9]", "-", self.zatca_unique_seq))
                 atts = self.env['ir.attachment'].sudo().search([('res_model', '=', 'account.move'),
                                                                 ('res_field', '=', 'zatca_hash_cleared_invoice'),
@@ -1658,8 +1668,8 @@ class AccountMove(models.Model):
         _zatca.info('_compute_qr_code_str')
         self = self.sudo()
         try:
-            invoice_date = datetime.datetime.strptime(self.invoice_date, DEFAULT_SERVER_DATE_FORMAT).date()
-            l10n_sa_phase1_end_date = datetime.datetime.strptime(self.l10n_sa_phase1_end_date, DEFAULT_SERVER_DATE_FORMAT).date() if self.l10n_sa_phase1_end_date else False
+            invoice_date = datetime.datetime.strptime(str(self.invoice_date), DEFAULT_SERVER_DATE_FORMAT).date()
+            l10n_sa_phase1_end_date = datetime.datetime.strptime(str(self.l10n_sa_phase1_end_date), DEFAULT_SERVER_DATE_FORMAT).date() if self.l10n_sa_phase1_end_date else False
             if not self.is_zatca or (phase_1_ending_date and invoice_date <= phase_1_ending_date):
                 return super()._compute_qr_code_str()
             is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
@@ -1707,6 +1717,10 @@ class AccountMove(models.Model):
 
         try:
             for record in self:
+                if record.country_code == 'SA' and record.move_type in ('out_invoice', 'out_refund') and not record.sa_confirmation_datetime:
+                    if not record.l10n_sa_show_delivery_date:
+                        raise exceptions.UserError(_('Delivery Date cannot be empty'))
+                    record.write({'sa_confirmation_datetime': fields.Datetime.now()})
                 qr_code_str = ''
                 conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id)
                 partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(record.company_id)
@@ -1714,7 +1728,7 @@ class AccountMove(models.Model):
                 if record.sa_confirmation_datetime and record.company_id.vat:
                     seller_name_enc = get_qr_encoding(1, conf_company["name"]['value'])
                     company_vat_enc = get_qr_encoding(2, company_id.vat)
-                    sa_confirmation_datetime = datetime.datetime.strptime(record.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
+                    sa_confirmation_datetime = datetime.datetime.strptime(str(record.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
                     time_sa = fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), sa_confirmation_datetime)
                     timestamp_enc = get_qr_encoding(3, sa_confirmation_datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
                     # invoice_total_enc = get_qr_encoding(4, float_repr(abs(record.amount_total_signed), 2))
@@ -1820,7 +1834,7 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
-                if record.state in ['open', 'paid']:
+                if record.state in 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if not record.zatca_onboarding_status:
@@ -1854,6 +1868,19 @@ class AccountMove(models.Model):
                         elif record.l10n_sa_invoice_type == 'Simplified':
                             record.send_for_reporting(self._context)
         return res
+    def action_post(self):
+        conf = self.company_id.sudo()
+        res = super().action_post()
+        if self.l10n_sa_invoice_type and self.move_type in ['out_invoice', 'out_refund'] and conf.is_zatca:
+            self.create_xml_file()
+            if self.env.company.zatca_send_from_pos:
+                if not self.zatca_onboarding_status:
+                    self.send_for_compliance()
+                elif self.l10n_sa_invoice_type == 'Standard':
+                    self.send_for_clearance()
+                elif self.l10n_sa_invoice_type == 'Simplified':
+                    self.send_for_reporting()
+        return res
 
     @api.depends('country_code', 'move_type')
     def _compute_show_delivery_date(self):
@@ -1876,21 +1903,21 @@ class AccountMove(models.Model):
     # @api.multi
     def unlink(self):
         for record in self:
-            if record.l10n_sa_prohibited_exception() and record.state in ['open', 'paid']:
+            if record.l10n_sa_prohibited_exception() and record.state != 'draft':
                 raise exceptions.AccessError(_(message))
         return super(AccountMove, self).unlink()
 
     # @api.multi
     def button_draft(self):
         for record in self:
-            if record.l10n_sa_prohibited_exception() and record.state in ['open', 'paid'] and record.zatca_status_code != '400':
+            if record.l10n_sa_prohibited_exception() and record.state == 'posted' and record.zatca_status_code != '400':
                 raise exceptions.AccessError(_(message))
         return super(AccountMove, self).button_draft()
 
     # @api.multi
     def button_cancel(self):
         for record in self:
-            if record.l10n_sa_prohibited_exception() and record.state in ['open', 'paid']:
+            if record.l10n_sa_prohibited_exception() and record.state == 'posted':
                 raise exceptions.AccessError(_(message))
         return super(AccountMove, self).button_cancel()
 
