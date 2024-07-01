@@ -94,11 +94,11 @@
                 <t t-if="doc_model == 'pos.order'">
                     <t t-set="doc" t-value="doc.account_move"/>
                 </t>
-                <t t-if="doc.debit_invoice_id">
+                <t t-if="doc.debit_note_ids">
                     <t t-set="invoice_type" t-value="'Simplified Debit Note'"/>
                     <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ مبسطة'"/>
                 </t>
-                <t t-elif="doc.type == 'out_refund'">
+                <t t-elif="doc.move_type == 'out_refund'">
                     <t t-set="invoice_type" t-value="' Simplified Credit Note'"/>
                     <t t-set="invoice_type_ar" t-value="'اشعار دائن مبسطة'"/>
                 </t>
@@ -179,7 +179,7 @@
                                         <span class="label_column arabic_label">العملة الضريبية</span>
                                     </td>
                                 </tr>
-                                <t t-if="doc.refund_invoice_id or doc.debit_invoice_id">
+                                <t t-if="doc.debit_note_ids or doc.debit_note_ids">
                                     <tr>
                                         <td>
                                             <span class="label_column">
@@ -454,7 +454,7 @@
                                         <span>Amount Due</span>
                                     </td>
                                     <td class="right_column">
-                                        <span t-esc="doc.residual" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        <span t-esc="doc.amount_residual" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                     </td>
                                     <td class="right_column arabic_label">
                                         <span>المبلغ المتبقي</span>
@@ -462,7 +462,7 @@
                                 </tr>
                             </table>
                             <hr></hr>
-                            <table width="100%" class="reason_table" t-if="doc.refund_invoice_id or doc.debit_invoice_id">
+                            <table width="100%" class="reason_table" t-if="doc.debit_note_ids or doc.debit_note_ids">
                                 <tr>
                                     <td>
                                         <span class="left_column">Reason for issuance of
@@ -477,7 +477,7 @@
                                     </td>
                                 </tr>
                             </table>
-                            <hr t-if="doc.refund_invoice_id or doc.debit_invoice_id"></hr>
+                            <hr t-if="doc.debit_note_ids or doc.debit_note_ids"></hr>
                         </div>
 
                     </div>

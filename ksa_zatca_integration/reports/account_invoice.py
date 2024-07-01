@@ -1,12 +1,10 @@
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
-from .pdf import OdooPdfFileReader, OdooPdfFileWriter
-from odoo import api, fields, models, exceptions, _
-from odoo.tools.float_utils import float_round
+from odoo import api, fields, models, exceptions
+from odoo.tools.pdf import OdooPdfFileReader, OdooPdfFileWriter
 from odoo.tools import mute_logger
 from odoo.http import request
-from datetime import timedelta
-import lxml.etree as ET
+from datetime import timedelta 
 import datetime
+import lxml.etree as ET
 import logging
 import base64
 import qrcode
@@ -18,9 +16,27 @@ _zatca = logging.getLogger('Zatca Debugger for account.move :')
 class AccountMoveReport(models.Model):
     _inherit = 'account.move'
 
-    def get_context_datetime(self):
-        sa_confirmation_datetime = datetime.datetime.strptime(self.sa_confirmation_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
-        return fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), sa_confirmation_datetime).strftime('%Y-%m-%d %H:%M')
+    def _default_currency_id(self):
+        self.invoice_multi_currency_id = self.currency_id
+
+    invoice_multi_currency_id = fields.Many2one('res.currency', string='Invoice Report Currency',
+                                                compute="_default_currency_id")
+
+    def get_other_id(self, eng):
+        other_id = {
+           "Tax Identification Number": "رقم التعريف الضريبي",
+           "Commercial Registration number": "رقم السجل التجاري",
+           "Momrah license": "رخصة معمره",
+           "MHRSD license": "رخصة MHRSD",
+           "700 Number": "700 رقم",
+           "MISA license": "رخصة ميسا",
+           "National ID": "الهوية الوطنية",
+           "GCC ID": "معرف دول مجلس التعاون الخليجي",
+           "Iqama Number": "رقم الاقامة",
+           "Passport ID": "رقم جواز السفر",
+           "Other OD": "التطوير التنظيمي الآخر",
+       }
+        return other_id.get(eng, 'error')
 
     def get_tax_amount(self):
         data = 0.0
@@ -30,18 +46,23 @@ class AccountMoveReport(models.Model):
                 data += ((rec.tax_ids[0].amount if rec.tax_ids else 0.0) * taxable_amount) / 100
         return data
 
-    def _l10n_sa_pdf_conversion(self, pdf_content):
+    def _l10n_sa_pdf_conversion(self, collected_streams):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         xml = self.zatca_hash_cleared_invoice if is_tax_invoice else self.zatca_invoice
         if not xml:
-            raise exceptions.MissingError(_("Cleared invoice from zatca is required.") if is_tax_invoice else _("xml not generated."))
+            raise exceptions.MissingError('Cleared invoice from zatca is required' if is_tax_invoice else "xml not generated.")
         if xml:
             xml_facturx = base64.b64decode(xml)
+            print("***************************************************")
+            # print(type(collected_streams))
+            # pdf_stream = collected_streams[self.id]['stream']
 
+            pdf_content = collected_streams.getvalue()
             reader_buffer = io.BytesIO(pdf_content)
             reader = OdooPdfFileReader(reader_buffer, strict=False)
             writer = OdooPdfFileWriter()
             writer.cloneReaderDocumentRoot(reader)
+
             writer.addAttachment(self.zatca_invoice_name, xml_facturx, subtype='text/xml')
 
             try:
@@ -49,39 +70,42 @@ class AccountMoveReport(models.Model):
             except Exception as e:
                 _zatca.exception("Error while converting to PDF/A: %s", e)
 
-            metadata_template = self.env.ref('ksa_zatca_integration.account_invoice_pdfa_3_facturx_metadata', raise_if_not_found=False)
-            writer.add_file_metadata(metadata_template.render({
-                'title': self.name,
-                'date': fields.Date.context_today(self),
-            }))
+            content = self.env['ir.qweb']._render('account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata',
+                {
+                    'title': self.name,
+                    'date': fields.Date.context_today(self),
+                },
+            )
+            writer.add_file_metadata(content.encode())
 
+            pdf_stream.close()
             writer_buffer = io.BytesIO()
             writer.write(writer_buffer)
-            pdf_content = writer_buffer.getvalue()
+            collected_streams[self.id]['stream'] = writer_buffer
             reader_buffer.close()
-            writer_buffer.close()
-        return pdf_content
+            # writer_buffer.close()
+        return collected_streams
 
     def print_einv_b2b(self):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         if not is_tax_invoice:
-            raise exceptions.MissingError(_("Not a standard invoice."))
+            raise exceptions.MissingError("Not a standard invoice.")
         if not self.zatca_invoice:
-            raise exceptions.MissingError(_("Xml not created yet."))
+            raise exceptions.MissingError("Xml not created yet.")
         if not self.zatca_onboarding_status:
-            raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
+            raise exceptions.MissingError("Qr code can't be created with CCSID.")
         if not self.zatca_hash_cleared_invoice:
-            raise exceptions.MissingError(_("Cleared invoice from zatca is required."))
+            raise exceptions.MissingError("Cleared invoice from zatca is required.")
         return self.env.ref('ksa_zatca_integration.report_e_invoicing_b2b').report_action(self)
 
     def print_einv_b2c(self):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         if is_tax_invoice:
-            raise exceptions.MissingError(_("Not a simplified invoice."))
+            raise exceptions.MissingError("Not a simplified invoice.")
         if not self.zatca_invoice:
-            raise exceptions.MissingError(_("Xml not created yet."))
+            raise exceptions.MissingError("Xml not created yet.")
         if not self.zatca_onboarding_status:
-            raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
+            raise exceptions.MissingError("Qr code can't be created with CCSID.")
         return self.env.ref('ksa_zatca_integration.report_e_invoicing_b2c').report_action(self)
 
     def get_invoice_type_code(self):
@@ -89,22 +113,6 @@ class AccountMoveReport(models.Model):
         xml_file = ET.fromstring(invoice).getroottree()
         ksa_2 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}InvoiceTypeCode").attrib.get('name', '')
         return ksa_2
-
-    def get_other_id(self, eng):
-        other_id = {
-            "Tax Identification Number": "رقم التعريف الضريبي",
-            "Commercial Registration number": "رقم السجل التجاري",
-            "Momrah license": "رخصة معمره",
-            "MHRSD license": "رخصة MHRSD",
-            "700 Number": "700 رقم",
-            "MISA license": "رخصة ميسا",
-            "National ID": "الهوية الوطنية",
-            "GCC ID": "معرف دول مجلس التعاون الخليجي",
-            "Iqama Number": "رقم الاقامة",
-            "Passport ID": "رقم جواز السفر",
-            "Other OD": "التطوير التنظيمي الآخر",
-        }
-        return other_id.get(eng, 'error')
 
     def get_bt_131(self, id):
         id = str(int(id))
@@ -162,16 +170,7 @@ class AccountMoveReport(models.Model):
         bt_126 = xml_file.find(ksa_12_find).getparent()
         tax_total = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}TaxTotal')
         if tax_total is None:
-            bt_131 = self.get_bt_131(id)
-            if bt_131 == 0:
-                return 0
-            bg_31 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}Item')
-            bg_20 = bg_31.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}ClassifiedTaxCategory')
-            bt_152 = bg_20.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Percent')
-            bt_152 = 0 if bt_152 is None else (float(bt_152.text) if float(bt_152.text) else 0)
-            ksa_11 = float('{:0.2f}'.format(float_round(bt_131 * bt_152 / 100, precision_rounding=0.01)))  # BR-KSA-50
-            ksa_12 = float('{:0.2f}'.format(float_round(bt_131 + ksa_11, precision_rounding=0.01)))  # BR-KSA-51
-            return ksa_12
+            return 0.0
         ksa_12 = tax_total.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}RoundingAmount')
         return float(ksa_12.text) if float(ksa_12.text) else 0
 
@@ -182,7 +181,12 @@ class AccountMoveReport(models.Model):
         if tax_total is None:
             return 0.0
         bt_120 = tax_total.findall('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxExemptionReason')
-        return [bt_120_text.text for bt_120_text in bt_120] if len(bt_120) > 0 else False
+        if not len(bt_120):
+            return ""
+        bt_120_text = ''
+        for x in bt_120:
+            bt_120_text += x.text + ", "
+        return bt_120_text[:-2]
 
     @mute_logger('Zatca Debugger for account.move :')
     def get_qrcode(self):
@@ -198,9 +202,9 @@ class AccountMoveReport(models.Model):
         #                     back_color='white')
         # x = img
         if not self.zatca_invoice:
-            raise exceptions.MissingError(_("Xml not created yet."))
+            raise exceptions.MissingError("Xml not created yet.")
         if not self.zatca_onboarding_status:
-            raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
+            raise exceptions.MissingError("Qr code can't be created with CCSID.")
 
         self._compute_qr_code_str()
         _zatca.info("l10n_sa_qr_code_str:: %s", self.l10n_sa_qr_code_str)
@@ -218,5 +222,9 @@ class AccountMoveReport(models.Model):
             img_str = base64.b64encode(buffered.getvalue())
             return img_str
 
-        _zatca.info("image_to_byte_array(qr).decode():: %s", image_to_byte_array(qr).decode())
+        _zatca.info("image_to_byte_array(qr).decode():: %s",image_to_byte_array(qr).decode())
         return "data:image/png;base64," + image_to_byte_array(qr).decode()
+
+    def get_context_datetime(self):
+        # sa_confirmation_datetime = datetime.datetime.strptime(str(self.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
+        return fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), self.sa_confirmation_datetime).strftime('%Y-%m-%d %H:%M')
