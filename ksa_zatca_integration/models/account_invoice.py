@@ -163,7 +163,6 @@ class AccountMove(models.Model):
         for res in self:
             res.l10n_sa_zatca_status = "Not Sended to Zatca"
             sa_confirmation_datetime = datetime.datetime.strptime(str(res.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT) if res.sa_confirmation_datetime else False
-            print("*****************************res.l10n_sa_phase1_end_date", res.l10n_sa_phase1_end_date, res.company_id)
             l10n_sa_phase1_end_date = datetime.datetime.strptime(str(res.l10n_sa_phase1_end_date), DEFAULT_SERVER_DATE_FORMAT).date() if res.l10n_sa_phase1_end_date else False
             if sa_confirmation_datetime and l10n_sa_phase1_end_date and sa_confirmation_datetime.date() <= l10n_sa_phase1_end_date:
                 res.l10n_sa_zatca_status = "Phase 1"
@@ -514,11 +513,9 @@ class AccountMove(models.Model):
     def create_xml_file(self, previous_hash=0, pos_refunded_order_id=0):
         amount_verification = 0  # for debug mode
         conf = self.company_id.sudo()
-        print(self.sa_confirmation_datetime, self.move_type,self.country_code)
         if not self.sa_confirmation_datetime :
             if not self.l10n_sa_show_delivery_date:
                 raise exceptions.UserError(_('Delivery Date cannot be empty'))
-                print("**********************************")
                 self.sa_confirmation_datetime = fields.Datetime.now()
             self.write({'sa_confirmation_datetime': fields.Datetime.now()})
 
@@ -656,7 +653,6 @@ class AccountMove(models.Model):
         if not previous_hash:
             ubl_2_1 += '''
                 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>'''
-        print("****************************************",self.sa_confirmation_datetime)
         sa_confirmation_datetime = datetime.datetime.strptime(str(self.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
         ubl_2_1 += '''
             <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
@@ -1035,6 +1031,7 @@ class AccountMove(models.Model):
 
         file_name_specification = str(bt_31) + "_" + sa_confirmation_datetime.strftime('%Y%m%dT%H%M%SZ') + "_" + str(self.id)
         self.zatca_invoice_name = file_name_specification + ".xml"
+        print(conf, ubl_2_1)
         self.hash_with_c14n_canonicalization(conf, xml=ubl_2_1)
         # conf.zatca_pih = self.zatca_invoice_hash
         if signature:
@@ -1578,7 +1575,10 @@ class AccountMove(models.Model):
     def hash_with_c14n_canonicalization(self, conf, api_invoice=0, xml=0, auto_compliance=0):
         invoice = base64.b64decode(self.zatca_invoice).decode() if not xml else xml
         try:
+            print(invoice)
+            print(self.zatca_invoice)
             xml_file = ET.fromstring(invoice)
+            print(xml_file)
         except Exception as e:
             raise exceptions.ValidationError(_("Xml Validation error\npossible reasons\n"
                                                "special character is present in address of company or customer"))
