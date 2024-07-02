@@ -1031,7 +1031,8 @@ class AccountMove(models.Model):
 
         file_name_specification = str(bt_31) + "_" + sa_confirmation_datetime.strftime('%Y%m%dT%H%M%SZ') + "_" + str(self.id)
         self.zatca_invoice_name = file_name_specification + ".xml"
-        print(conf, ubl_2_1)
+        _zatca.info(conf)
+        _zatca.info(ubl_2_1)
         self.hash_with_c14n_canonicalization(conf, xml=ubl_2_1)
         # conf.zatca_pih = self.zatca_invoice_hash
         if signature:
@@ -1575,10 +1576,10 @@ class AccountMove(models.Model):
     def hash_with_c14n_canonicalization(self, conf, api_invoice=0, xml=0, auto_compliance=0):
         invoice = base64.b64decode(self.zatca_invoice).decode() if not xml else xml
         try:
-            print(invoice)
-            print(self.zatca_invoice)
+            _zatca.info(invoice)
+            _zatca.info(self.zatca_invoice)
             xml_file = ET.fromstring(invoice)
-            print(xml_file)
+            _zatca.info(xml_file)
         except Exception as e:
             raise exceptions.ValidationError(_("Xml Validation error\npossible reasons\n"
                                                "special character is present in address of company or customer"))
