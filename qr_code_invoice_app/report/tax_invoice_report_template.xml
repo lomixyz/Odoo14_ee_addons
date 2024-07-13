@@ -246,6 +246,13 @@
                             </td>
                             <th width="30%" class="text-right"> (المجموع (شامل الضريبة </th>
                         </tr>
+                        <tr>
+                            <th width="30%" class="text-left">Amount Residual</th>
+                            <td width="40%" class="text-right">
+                                <span t-field="o.amount_residual"/>
+                            </td>
+                            <th width="30%" class="text-right">المبلغ المتبقي</th>
+                        </tr>
 
 
                     </table>
