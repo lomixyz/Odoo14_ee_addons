@@ -228,7 +228,7 @@
                         <tr>
                             <th width="30%" class="text-left">Discount</th>
                             <td width="40%" class="text-right">
-                                <span t-field="o.total_discount_amount"/>
+                                <span t-field="o.total_discount"/>
                             </td>
                             <th width="30%" class="text-right">مجموع الخصومات</th>
                         </tr>

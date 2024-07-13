@@ -545,7 +545,7 @@ class AccountMove(models.Model):
             if pos_refunded_order_id:
                 bt_25 = bt_25.browse(int(pos_refunded_order_id))
             else:
-                bt_25 = self.refund_invoice_id or self.debit_invoice_id
+                bt_25 = self.reversed_entry_id or self.debit_origin_id
                 if not self.origin or not bt_25.id:
                     raise exceptions.MissingError(_('Original Invoice Ref not found.'))
             if bt_25.l10n_sa_invoice_type != self.l10n_sa_invoice_type:
