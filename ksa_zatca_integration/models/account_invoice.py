@@ -1871,7 +1871,7 @@ class AccountMove(models.Model):
         return res
     
     def action_post(self):
-        if if self.env.user.company_id.zatca_send_from_pos:
+        if self.env.user.company_id.zatca_send_from_pos:
             conf = self.company_id.sudo()
             res = super().action_post()
             if self.l10n_sa_invoice_type and self.move_type in ['out_invoice', 'out_refund'] and conf.is_zatca:
