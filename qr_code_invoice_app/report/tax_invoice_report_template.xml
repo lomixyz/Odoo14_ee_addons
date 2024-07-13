@@ -78,16 +78,11 @@
                         <tr>
                             <th width="15%" class="text-left">Salesperson</th>
                             <td width="40%" colspan="2" class="text-center">
-                                <t t-if="o.supply_date">
-                                    <span t-field="o.supply_date"/>
-                                </t>
-                                <t t-else="o.datetime_invoice">
-                                    <span t-field="o.invoice_user_id.name" />
--
-                                    <span t-field="o.invoice_user_id.partner_id.phone" />
- -
-                                    <span t-field="o.invoice_user_id.partner_id.mobile" />
-                                </t>
+                                <span t-field="o.invoice_user_id.name" />
+                                <br/>
+                                <span t-field="o.invoice_user_id.partner_id.phone" />
+                                <br/>
+                                <span t-field="o.invoice_user_id.partner_id.mobile" />
                             </td>
                             <th width="15%" class="text-right">البائع</th>
                         </tr>
@@ -277,11 +272,23 @@
                                     <th colspan="2" class="text-right">معلومات السداد</th>
                                 </tr>
                                 <tr style="background-color:gray;color:white;">
-                                    <th><div>Number</div><div>الرقم</div></th>
+                                    <th>
+                                        <div>Number</div>
+                                        <div>الرقم</div>
+                                    </th>
                                     <!-- <th><div>Ref</div><div>المرجع</div></th> -->
-                                    <th><div>Date</div><div>التاريخ</div></th>
-                                    <th><div>Method</div><div>الطريقة</div></th>
-                                    <th class="text-right"><div>Amount</div><div>المبلغ</div></th>
+                                    <th>
+                                        <div>Date</div>
+                                        <div>التاريخ</div>
+                                    </th>
+                                    <th>
+                                        <div>Method</div>
+                                        <div>الطريقة</div>
+                                    </th>
+                                    <th class="text-right">
+                                        <div>Amount</div>
+                                        <div>المبلغ</div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
