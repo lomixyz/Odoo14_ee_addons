@@ -261,8 +261,8 @@
                             <td width="40%" class="text-right"> <span t-field="o.amount_total"/></td>
                             <th width="30%" class="text-right"> (المجموع (شامل الضريبة </th>
                         </tr>
-                        <!--
-                            <t t-set="payments_vals" t-value="o._get_payments_vals()"/>
+                        
+                            <!-- <t t-set="payments_vals" t-value="o._get_payments_vals()"/>
                             <t t-foreach="payments_vals" t-as="payment_vals">
                                 <tr>
                                     <td>
@@ -277,22 +277,65 @@
                                 <th width="30%" class="text-left">Amount Due</th>
                                 <td width="40%" class="text-right"> <span t-field="o.residual"/></td>
                                 <th width="30%" class="text-right">المبلغ المتبقي</th>
-                            </tr>
-                        -->
+                            </tr> -->
+                       
                     </table>
-
-                    <!--p t-if="o.reference">
-                        Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
-                    </p-->
-                    <!--p t-if="o.comment" name="comment">
-                        <span t-field="o.comment"/>
-                    </p-->
-                    <!--p t-if="o.payment_term_id" name="payment_term">
-                        <span t-field="o.payment_term_id.note"/>
-                    </p-->
-                    <!--p t-if="o.fiscal_position_id.note" name="note">
+                    <p t-if="o.narration">
+                        <strong>Comment:</strong>
+                        <span t-field="o.narration"/>
+                    </p>
+                    <p t-if="o.invoice_payment_term_id">
+                        <span t-field="o.invoice_payment_term_id.note"/>
+                    </p>
+                    <p t-if="o.fiscal_position_id.note">
+                        <strong>Fiscal Position Remark:</strong>
                         <span t-field="o.fiscal_position_id.note"/>
-                    </p-->
+                    </p>
+                    
+                    <b>Payment Status : </b><span t-field="o.state"/><br/>
+                    <t t-if="o.invoice_payments_widget">
+                        <div class="row">
+                            <div class="col-6">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Number</th>
+                                            <th>Ref</th>
+                                            <th>Date</th>
+                                            <th>Method</th>
+                                            <th class="text-right">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="payment_ids" t-value="get_paid_id(o)"/>
+                                        <tr t-foreach="payment_ids" t-as="p">
+                                            <td><span t-esc="p.get('name')"/></td>
+                                            <td><span t-esc="o.invoice_origin"/></td> 
+                                            <td><span t-esc="p.get('date')"/></td>
+                                            <td><span t-esc="p.get('journal_name')"/></td> 
+                                            <td class="text-right">
+                                                <span t-esc="p.get('amount')"
+                                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- <p t-if="o.reference">
+                        Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
+                    </p>
+                    <p t-if="o.comment" name="comment">
+                        <span t-field="o.comment"/>
+                    </p>
+                    <p t-if="o.payment_term_id" name="payment_term">
+                        <span t-field="o.payment_term_id.note"/>
+                    </p>
+                    <p t-if="o.fiscal_position_id.note" name="note">
+                        <span t-field="o.fiscal_position_id.note"/>
+                    </p> -->
                 </div>
             </t>
         </template>
