@@ -513,7 +513,7 @@ class AccountMove(models.Model):
     def create_xml_file(self, previous_hash=0, pos_refunded_order_id=0):
         amount_verification = 0  # for debug mode
         conf = self.company_id.sudo()
-        if not self.sa_confirmation_datetime :
+        if not self.sa_confirmation_datetime:
             if not self.l10n_sa_show_delivery_date:
                 raise exceptions.UserError(_('Delivery Date cannot be empty'))
                 self.sa_confirmation_datetime = fields.Datetime.now()
@@ -782,7 +782,7 @@ class AccountMove(models.Model):
                 ubl_2_1 += '''
                 <cbc:ActualDeliveryDate>''' + str(ksa_5.strftime('%Y-%m-%d')) + '''</cbc:ActualDeliveryDate>'''
             if latest_delivery_date and not_know:
-                ksa_24 = datetime.datetime.strptime(str(l10n_sa_delivery_date) ,DEFAULT_SERVER_DATE_FORMAT)
+                ksa_24 = datetime.datetime.strptime(str(l10n_sa_delivery_date) , DEFAULT_SERVER_DATE_FORMAT)
                 if ksa_24 < ksa_5:
                     raise exceptions.ValidationError(_('LatestDeliveryDate must be less then or equal to ActualDeliveryDate'))
                 ubl_2_1 += '''
@@ -1871,18 +1871,19 @@ class AccountMove(models.Model):
         return res
     
     def action_post(self):
-        conf = self.company_id.sudo()
-        res = super().action_post()
-        if self.l10n_sa_invoice_type and self.move_type in ['out_invoice', 'out_refund'] and conf.is_zatca:
-            self.create_xml_file()
-            if self.env.company.zatca_send_from_pos:
-                if not self.zatca_onboarding_status:
-                    self.send_for_compliance()
-                elif self.l10n_sa_invoice_type == 'Standard':
-                    self.send_for_clearance()
-                elif self.l10n_sa_invoice_type == 'Simplified':
-                    self.send_for_reporting()
-        return res
+        if if self.env.user.company_id.zatca_send_from_pos:
+            conf = self.company_id.sudo()
+            res = super().action_post()
+            if self.l10n_sa_invoice_type and self.move_type in ['out_invoice', 'out_refund'] and conf.is_zatca:
+                self.create_xml_file()
+                if self.env.company.zatca_send_from_pos:
+                    if not self.zatca_onboarding_status:
+                        self.send_for_compliance()
+                    elif self.l10n_sa_invoice_type == 'Standard':
+                        self.send_for_clearance()
+                    elif self.l10n_sa_invoice_type == 'Simplified':
+                        self.send_for_reporting()
+            return res
 
     @api.depends('country_code', 'move_type')
     def _compute_show_delivery_date(self):
