@@ -12,10 +12,12 @@
             <t t-call="qr_code_invoice_app.qr_invoice_internal_layout" style="margin-top:0px;padding-top:0px;display:inline;">
                 <div class="page" style="margin-top:0px;padding-top:0px;">
                     <center>
-                        <h4>فـاتـورة ضـريبية</h4>
+                        <h4 t-if="not o.move_type == 'out_refund'">فـاتـورة ضـريبية</h4>
+                        <h4 t-if="o.move_type == 'out_refund'">مرتجع فاتورة ضربية</h4>
                     </center>
                     <center>
-                        <h4>Tax Invoice</h4>
+                        <h4 t-if="not o.move_type == 'out_refund'">Tax Invoice</h4>
+                        <h4 t-if="o.move_type == 'out_refund'">Credit Tax Invoice</h4>
                     </center>
                     <table width="100%" class="table table-sm table-bordered" style="font-size:12px;">
                         <tr>
@@ -32,14 +34,25 @@
                                 <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">فـاتورة</span>
                                 <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">فاتورة مبدئية</span>
                                 <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">فاتورة ملغية</span>
-                                <span t-if="o.move_type == 'out_refund'">إشعار خصم عميل</span>
+                                <span t-if="o.move_type == 'out_refund'">مرتجع فاتورة ضربية</span>
                                 <span t-if="o.move_type == 'in_refund'">إشعار خصم مورد</span>
                                 <span t-if="o.move_type == 'in_invoice'">فاتورة مورد</span>
                             </td>
                             <th width="15%" class="text-right">النوع</th>
                             <td width="20%" rowspan="6">
                                 <t t-if="o.state == 'posted'">
-                                    <span t-field="o.qr_image" t-options='{"widget": "image"}' />
+                                    <!-- <span t-field="o.qr_image" t-options='{"widget": "image"}' /> -->
+                                        
+                                    <div class="row">
+                                    <div style="width:150px;height:150px;" class="col-4">
+                                        <img t-if="o.l10n_sa_qr_code_str"
+                                             style="display:block;margin:10% auto 0 auto;"
+                                             t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', o.l10n_sa_qr_code_str, 150, 150)"/>
+
+                                    </div>
+                                 </div>
+
+                       
                                 </t>
                                 <t t-else="">
                                     <span>Qr will be generated after invoice confirmed</span>
