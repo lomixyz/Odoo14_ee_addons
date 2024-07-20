@@ -12,12 +12,14 @@
             <t t-call="qr_code_invoice_app.qr_invoice_internal_layout" style="margin-top:0px;padding-top:0px;display:inline;">
                 <div class="page" style="margin-top:0px;padding-top:0px;">
                     <center>
-                        <h4 t-if="not o.move_type == 'out_refund'">فـاتـورة ضـريبية</h4>
-                        <h4 t-if="o.move_type == 'out_refund'">مرتجع فاتورة ضربية</h4>
-                    </center>
-                    <center>
-                        <h4 t-if="not o.move_type == 'out_refund'">Tax Invoice</h4>
-                        <h4 t-if="o.move_type == 'out_refund'">Credit Tax Invoice</h4>
+                        <t t-if="o.move_type == 'out_refund'">
+                            <h4>مرتجع فاتورة ضربية</h4>
+                            <h4>Credit Tax Invoice</h4>
+                        </t>
+                        <t t-else="">
+                            <h4>فـاتـورة ضـريبية</h4>
+                            <h4>Tax Invoice</h4>
+                        </t>
                     </center>
                     <table width="100%" class="table table-sm table-bordered" style="font-size:12px;">
                         <tr>
