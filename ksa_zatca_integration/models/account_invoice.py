@@ -1839,8 +1839,8 @@ class AccountMove(models.Model):
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if not record.zatca_onboarding_status:
-                            pass
-                            # record.send_for_compliance()
+                            # pass
+                            record.send_for_compliance()
                         else:
                             if record.l10n_sa_invoice_type == 'Standard':
                                 record.send_for_clearance()
