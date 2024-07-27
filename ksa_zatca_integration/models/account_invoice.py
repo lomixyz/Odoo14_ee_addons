@@ -1821,8 +1821,8 @@ class AccountMove(models.Model):
         return self.invoices_reporting_single_api(no_xml_generate)
 
     def send_multiple_to_zatca(self):
-        self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
-
+        # self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
+        print("****************************")
         # if len(self.ids) and int(self[0].zatca_icv_counter) > 1:
         #     def get_last_zatca_invoice(self, icv):
         #         record = self.search([('zatca_icv_counter', '=', icv -1)], limit=1)
@@ -1835,6 +1835,7 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
+                print(record.l10n_sa_invoice_type, record.zatca_onboarding_status)
                 if record.state in 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
