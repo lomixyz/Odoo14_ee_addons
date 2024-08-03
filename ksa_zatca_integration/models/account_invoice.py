@@ -673,7 +673,7 @@ class AccountMove(models.Model):
                 <cbc:ID>''' + str(self.check_allowed_size(0, 127, self.purchase_id.id, self._fields['purchase_id'].string)) + '''</cbc:ID>
             </cac:OrderReference>'''
         if bt_3 != '388':  # BR-KSA-56
-            bt_25_sa_confirmation_datetime = datetime.datetime.strptime(str(bt_25.sa_confirmation_datetime), DEFAULT_SERVER_DATETIME_FORMAT)
+            bt_25_sa_confirmation_datetime = datetime.datetime.strptime(str(bt_25.sa_confirmation_datetime or fields.Datetime.now()), DEFAULT_SERVER_DATETIME_FORMAT)
             ubl_2_1 += '''
             <cac:BillingReference>
                 <cac:InvoiceDocumentReference>
@@ -1883,7 +1883,8 @@ class AccountMove(models.Model):
                         self.send_for_clearance()
                     elif self.l10n_sa_invoice_type == 'Simplified':
                         self.send_for_reporting()
-        self.button_create_picking()
+        if self.delivery_count == 0:
+            self.button_create_picking()
         return res
 
     @api.depends('country_code', 'move_type')
