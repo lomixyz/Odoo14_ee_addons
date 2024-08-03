@@ -1872,6 +1872,7 @@ class AccountMove(models.Model):
     def action_post(self):
         conf = self.company_id.sudo()
         res = super().action_post()
+        
         if self.env.user.company_id.zatca_send_from_pos:
             if self.l10n_sa_invoice_type and self.move_type in ['out_invoice', 'out_refund'] and conf.is_zatca:
                 self.create_xml_file()
@@ -1882,6 +1883,7 @@ class AccountMove(models.Model):
                         self.send_for_clearance()
                     elif self.l10n_sa_invoice_type == 'Simplified':
                         self.send_for_reporting()
+        self.button_create_picking()
         return res
 
     @api.depends('country_code', 'move_type')
