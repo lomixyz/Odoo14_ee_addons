@@ -74,19 +74,19 @@ class AccountMove(models.Model):
                 for move_val in move_vals:
                     self.env['stock.move']\
                         .create(move_val)\
-                        ._action_confirm()\
-                        ._action_assign()
+                        # ._action_confirm()\
+                        # ._action_assign()
             self.env.cr.commit()
-            try:
-                res = picking.button_validate()
-                if res:
-                    if res.get('res_model') == 'stock.immediate.transfer':
-                        wizard = self.env['stock.immediate.transfer'].browse(res.get('res_id'))
-                        wizard.process()
-                        return True
-                return res
-            except Exception:
-                pass
+            # try:
+            #     res = picking.button_validate()
+            #     if res:
+            #         if res.get('res_model') == 'stock.immediate.transfer':
+            #             wizard = self.env['stock.immediate.transfer'].browse(res.get('res_id'))
+            #             wizard.process()
+            #             return True
+            #     return res
+            # except Exception:
+            #     pass
         return True
 
     def button_create_return_picking(self):
@@ -125,6 +125,7 @@ class AccountMove(models.Model):
                                  default_picking_id=picking_id.id, default_picking_type_id=picking_id.picking_type_id.id, default_origin=self.name, default_group_id=picking_id.group_id.id)
         return action
 
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
@@ -143,3 +144,4 @@ class AccountMoveLine(models.Model):
                 lambda r: float_compare(r.quantity, values['quantity'], precision_digits=precision) != 0)._update_line_quantity(values)
         result = super(AccountMoveLine, self).write(values)
         return result
+

@@ -1883,7 +1883,7 @@ class AccountMove(models.Model):
                         self.send_for_clearance()
                     elif self.l10n_sa_invoice_type == 'Simplified':
                         self.send_for_reporting()
-        if self.delivery_count == 0:
+        if self.delivery_count == 0 and self.move_type in ['out_invoice']:
             self.button_create_picking()
         return res
 
