@@ -240,7 +240,7 @@
                             </td>
                             <th width="30%" class="text-right"> (الإجمالي (غير شامل الضريبة </th>
                         </tr>
-                        <tr>
+                        <tr t-if="o.total_discount">
                             <th width="30%" class="text-left">Discount</th>
                             <td width="40%" class="text-right">
                                 <span t-field="o.total_discount"/>
