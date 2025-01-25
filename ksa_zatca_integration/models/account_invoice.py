@@ -823,7 +823,11 @@ class AccountMove(models.Model):
                 </cac:TaxCategory>
             </cac:AllowanceCharge>'''
         invoice_line_xml = ''
+        bt_114 = 0
         for invoice_line_id in self.invoice_line_ids:
+            if invoice_line_id.price_unit < 0 :
+                bt_114 = bt_114 + abs(invoice_line_id.price_unit)
+                continue
             if invoice_line_id.discount:
                 bt_137 = float('{:0.2f}'.format(float_round(invoice_line_id.price_unit * invoice_line_id.quantity, precision_rounding=0.01)))
                 bt_138 = invoice_line_id.discount  # BR-KSA-DEC-01 for BT-138 only done
@@ -996,7 +1000,8 @@ class AccountMove(models.Model):
         bt_108 = 0
         bt_113 = 0
         bt_114 = 0
-        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
+        # bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
+        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 , precision_rounding=0.01)))
         # if bt_110 != float('{:0.2f}'.format(float_round(self.amount_tax, precision_rounding=0.01))):
         #     raise exceptions.ValidationError('Error in Tax Total Calculation')
         ubl_2_1 += '''
