@@ -976,8 +976,8 @@ class AccountMove(models.Model):
                 bt_117 = float('{:0.2f}'.format(float_round(0, precision_rounding=0.01)))
             tax_subtotal_xml += '''
             <cac:TaxSubtotal>
-                <cbc:TaxableAmount currencyID="''' + document_currency + '''">''' + str(bt_116) + '''</cbc:TaxableAmount>
-                <cbc:TaxAmount currencyID="''' + document_currency + '''">''' + str(bt_117) + '''</cbc:TaxAmount>
+                <cbc:TaxableAmount currencyID="''' + document_currency + '''">''' + str(self.amount_untaxed) + '''</cbc:TaxableAmount>
+                <cbc:TaxAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total - self.amount_untaxed) + '''</cbc:TaxAmount>
                 <cac:TaxCategory>
                     <cbc:ID>''' + str(bt_118) + '''</cbc:ID>
                     <cbc:Percent>''' + str(bt_119) + '''</cbc:Percent>'''
