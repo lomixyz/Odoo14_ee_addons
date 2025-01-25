@@ -1000,8 +1000,8 @@ class AccountMove(models.Model):
         bt_108 = 0
         bt_113 = 0
         # bt_114 = 0
-        # bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
-        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 , precision_rounding=0.01)))
+        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
+        # bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 , precision_rounding=0.01)))
         # if bt_110 != float('{:0.2f}'.format(float_round(self.amount_tax, precision_rounding=0.01))):
         #     raise exceptions.ValidationError('Error in Tax Total Calculation')
         ubl_2_1 += '''
