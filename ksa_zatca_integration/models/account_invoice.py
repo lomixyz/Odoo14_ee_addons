@@ -1000,8 +1000,8 @@ class AccountMove(models.Model):
         bt_108 = 0
         bt_113 = 0
         # bt_114 = 0
-        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
-        # bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 , precision_rounding=0.01)))
+        # bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 + bt_114, precision_rounding=0.01)))
+        bt_115 = float('{:0.2f}'.format(float_round(bt_112 - bt_113 , precision_rounding=0.01)))
         # if bt_110 != float('{:0.2f}'.format(float_round(self.amount_tax, precision_rounding=0.01))):
         #     raise exceptions.ValidationError('Error in Tax Total Calculation')
         ubl_2_1 += '''
@@ -1028,7 +1028,7 @@ class AccountMove(models.Model):
             ubl_2_1 += '''
                 <cbc:PayableRoundingAmount currencyID="''' + document_currency + '''">''' + str(bt_114) + '''</cbc:PayableRoundingAmount>'''
         ubl_2_1 += '''
-                <cbc:PayableAmount currencyID="''' + document_currency + '''">''' + str(bt_115 if bt_115 > 0 else 0) + (" | " + str(self.amount_residual) if amount_verification else '') + '''</cbc:PayableAmount>
+                <cbc:PayableAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total -  self.self.amount_residual) + '''</cbc:PayableAmount>
             </cac:LegalMonetaryTotal>'''
         ubl_2_1 += invoice_line_xml
         ubl_2_1 += '''
