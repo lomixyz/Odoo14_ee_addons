@@ -1028,7 +1028,7 @@ class AccountMove(models.Model):
             ubl_2_1 += '''
                 <cbc:PayableRoundingAmount currencyID="''' + document_currency + '''">''' + str(bt_114) + '''</cbc:PayableRoundingAmount>'''
         ubl_2_1 += '''
-                <cbc:PayableAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total -  self.self.amount_residual) + '''</cbc:PayableAmount>
+                <cbc:PayableAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total -  self.amount_residual) + '''</cbc:PayableAmount>
             </cac:LegalMonetaryTotal>'''
         ubl_2_1 += invoice_line_xml
         ubl_2_1 += '''
