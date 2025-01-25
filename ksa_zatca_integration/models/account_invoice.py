@@ -1006,18 +1006,18 @@ class AccountMove(models.Model):
         #     raise exceptions.ValidationError('Error in Tax Total Calculation')
         ubl_2_1 += '''
             <cac:TaxTotal>
-                <cbc:TaxAmount currencyID="''' + document_currency + '''">''' + str(bt_110) + '''</cbc:TaxAmount>'''
+                <cbc:TaxAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total - self.amount_untaxed) + '''</cbc:TaxAmount>'''
         ubl_2_1 += tax_subtotal_xml
         ubl_2_1 += '''
             </cac:TaxTotal>
             <cac:TaxTotal>
-                <cbc:TaxAmount currencyID="SAR">''' + str(bt_111) + '''</cbc:TaxAmount>
+                <cbc:TaxAmount currencyID="SAR">''' + str(self.amount_total - self.amount_untaxed) + '''</cbc:TaxAmount>
             </cac:TaxTotal>'''
         ubl_2_1 += '''
             <cac:LegalMonetaryTotal>
                 <cbc:LineExtensionAmount currencyID="''' + document_currency + '''">''' + str(bt_106) + '''</cbc:LineExtensionAmount>
-                <cbc:TaxExclusiveAmount currencyID="''' + document_currency + '''">''' + str(bt_109) + (" | " + str(self.amount_untaxed) if amount_verification else '') + '''</cbc:TaxExclusiveAmount>
-                <cbc:TaxInclusiveAmount currencyID="''' + document_currency + '''">''' + str(bt_112) + (" | " + str(self.amount_total) if amount_verification else '') + '''</cbc:TaxInclusiveAmount>'''
+                <cbc:TaxExclusiveAmount currencyID="''' + document_currency + '''">''' + str(self.amount_untaxed) + '''</cbc:TaxExclusiveAmount>
+                <cbc:TaxInclusiveAmount currencyID="''' + document_currency + '''">''' + str(self.amount_total) + '''</cbc:TaxInclusiveAmount>'''
         if bt_108:
             ubl_2_1 += '''
                 <cbc:ChargeTotalAmount currencyID="''' + document_currency + '''">''' + str(bt_108) + '''</cbc:ChargeTotalAmount>'''
