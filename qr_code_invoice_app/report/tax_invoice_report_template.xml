@@ -76,20 +76,58 @@
                             </td>
                             <th width="15%" class="text-right">تاريخ الإصدار </th>
                         </tr>
-                        <tr>
+                        <tr t-if="o.company_id.id != 6">
                             <th width="15%" class="text-left">Confirm Date</th>
                             <td width="40%" colspan="2" class="text-center">
                                 <span t-field="o.datetime_invoice"/>
                             </td>
                             <th width="15%" class="text-right"> تاريخ الاعتماد </th>
                         </tr>
+
+			<t t-if="o.company_id.id == 11">
                         <tr>
+                        <th width="15%" class="text-left">Reference</th>
+                        <td width="40%" colspan="2" class="text-center">
+                        <span t-field="o.payment_reference"/>
+                        </td>
+
+                        <th width="15%" class="text-right"> المرجع</th>
+                        </tr>
+                        </t>
+
+                        <t t-else="">
+                         <tr>
                             <th width="15%" class="text-left">Due Date</th>
                             <td width="40%" colspan="2" class="text-center">
-                                <span t-field="o.invoice_date_due"/>
+                               <span t-field="o.invoice_date_due"/>
+                           </td>
+                            <th width="15%" class="text-right">تاريخ الاستحقاق</th>
+                                </tr>
+                        </t>
+	
+			<tr t-if="o.company_id.id != 6">
+                            <th width="15%" class="text-left">Delivery Date</th>
+                            <td width="40%" colspan="2" class="text-center">
+                                <span t-field="o.l10n_sa_delivery_date"/>
+                                <br/>
+                                <span t-field="o.from_date" t-options='{"format": "HH:mm:ss"}'/> -
+                                <span t-field="o.to_date" t-options='{"format": "HH:mm:ss"}'/>
                             </td>
-                            <th width="15%" class="text-right">تاريخ الإستحقاق</th>
+                            <th width="15%" class="text-right">تاريخ التوصيل</th>
                         </tr>
+
+                     
+
+		     
+
+                    <tr t-if="o.company_id.id == 6 or o.company_id.id == 34">
+                        <th width="15%" class="text-left">Customer Reference</th>
+                        <td width="40%" colspan="2" class="text-center">
+                            <span t-field="o.ref"/>
+                        </td>
+                        <th width="15%" class="text-right">مرجع العميل</th>
+                    </tr>		
+
                         <tr>
                             <th width="15%" class="text-left">Salesperson</th>
                             <td width="40%" colspan="2" class="text-center">
@@ -101,6 +139,7 @@
                             </td>
                             <th width="15%" class="text-right">البائع</th>
                         </tr>
+
 
 
                     </table>
@@ -133,6 +172,19 @@
                             </td>
                             <th width="20%" class="text-right">رقم الجوال</th>
                         </tr>
+			<tr t-if="o.company_id.id != 6">
+                            <th width="15%" class="text-left">Address</th>
+                            <td width="40%" colspan="2" class="text-center">
+                                <span t-field="o.partner_id.street" />
+                                <span t-field="o.partner_id.street2" />
+                                <span t-field="o.partner_id.city" />
+                                <span t-field="o.partner_id.district" />
+                                <span t-field="o.partner_id.state_id" />
+                                <span t-field="o.partner_id.building_no" />
+                            </td>
+                            <th width="15%" class="text-right">العنوان</th>
+                        </tr>
+
 
                         <tr>
                             <th width="20%" class="text-left">VAT Number</th>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="view_delivery_time_from_to" model="ir.ui.view">
+    <field name="name">delivery.time</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='invoice_date']" position='after'>
+            <field name="from_date" string="From Time" attrs="{'required': [('company_id', '=', 5)], 'readonly': [('state', 'in', ('cancel', 'posted'))]}"/>
+            <field name="to_date" string="To Time" attrs="{'required': [('company_id', '=', 5)], 'readonly': [('state', 'in', ('cancel', 'posted'))]}"/>
+            <field name="invoice_payment_term_id"/>
+        </xpath>
+    </field>
+</record>
+</odoo>
