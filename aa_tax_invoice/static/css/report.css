@@ -1,0 +1,25 @@
+@font-face {
+    font-family: "AATajawal";
+    src: url(/aa_tax_invoice/static/fonts/Tajawal-Bold.ttf) format("truetype");
+}
+
+.aa_tax_invoice,
+.aa_tax_invoice_header,
+.aa_tax_invoice_footer {
+    font-family: "AATajawal", sans-serif;
+    color: rgba(14, 13, 13, 0.85);
+}
+
+.aa_tax_invoice .aa_qr_cell {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.aa_tax_invoice .aa_qr_cell img {
+    width: 150px;
+    height: 150px;
+}
+
+.aa_tax_invoice .aa_qr_note {
+    font-size: 10px;
+}
